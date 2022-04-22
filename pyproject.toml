@@ -2,7 +2,7 @@
 name = "eulerpy"
 version = "0.1.0"
 description = "My solutions to only the first 100 problems of project euler"
-authors = ["Your Name <you@example.com>"]
+authors = ["Achxy"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
