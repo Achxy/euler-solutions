@@ -1,0 +1,9 @@
+[project]
+name = "euler-solutions"
+version = "1.0.0"
+description = "Solutions to the first 100 problems of Project Euler"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
