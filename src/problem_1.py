@@ -9,9 +9,11 @@ def _summation_of_progression(leng, num):
 @measure
 def problem_1(length):
     length -= 1
-    return (
-        _summation_of_progression(length, 3) + _summation_of_progression(length, 5)
-    ) - _summation_of_progression(length, 15)
+    return int(
+        _summation_of_progression(length, 3)
+        + _summation_of_progression(length, 5)
+        - _summation_of_progression(length, 15)
+    )
 
 
 if __name__ == "__main__":
