@@ -2,7 +2,7 @@ from benchmark import measure
 
 
 @measure
-def problem_2(lim):
+def problem_2(lim=40_00_000):
     a, b, c, d = 1, 1, 2, 0
     while lim > c:
         d += c

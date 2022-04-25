@@ -7,7 +7,7 @@ def _summation_of_progression(leng, num):
 
 
 @measure
-def problem_1(length):
+def problem_1(length=1000):
     length -= 1
     return int(
         _summation_of_progression(length, 3)
