@@ -52,7 +52,12 @@ def start() -> None:
     functions: FnMap = load_all_files_in_directory(Path(__file__).parent)
     for fn in functions.values():
         fn()  # Results should be printed because of the `measure` decorator in the benchmark.py file
-    print(f"Total time for {len(functions)} problems to be completed: {time.perf_counter() - s_time}")
+    print(
+        (
+            f"Total time for {len(functions)} problems to be "
+            f"completed: {(time.perf_counter() - s_time) * 1000} milliseconds"
+        )
+    )
 
 
 if __name__ == "__main__":
