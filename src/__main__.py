@@ -44,7 +44,7 @@ def load_all_files_in_directory(directory: Path) -> FnMap:
     return functions
 
 
-def start():
+def start() -> None:
     """
     Entry point for executing all the programs in the directory
     """
