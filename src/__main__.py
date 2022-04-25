@@ -1,8 +1,9 @@
-from pathlib import Path
+from __future__ import annotations
+
 import importlib
 import time
+from pathlib import Path
 from typing import Callable, TypeAlias
-
 
 FnMap: TypeAlias = dict[str, Callable[..., int]]
 
