@@ -1,7 +1,7 @@
-from benchmark import measure
+from benchmark import Benchmarked
 
 
-@measure
+@Benchmarked
 def problem_6(lim=100):
     return int(((lim * (lim + 1) // 2) ** 2) - (lim + 1) * lim / 6 * (2 * lim + 1))
 

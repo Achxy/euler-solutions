@@ -1,4 +1,4 @@
-from benchmark import measure
+from benchmark import Benchmarked
 
 
 def _summation_of_progression(leng, num):
@@ -6,7 +6,7 @@ def _summation_of_progression(leng, num):
     return k * ((num + (num * k)) / 2)
 
 
-@measure
+@Benchmarked
 def problem_1(length=1000):
     length -= 1
     return int(

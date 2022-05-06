@@ -1,7 +1,7 @@
-from benchmark import measure
+from benchmark import Benchmarked
 
 
-@measure
+@Benchmarked
 def problem_2(lim=40_00_000):
     a, b, c, d = 1, 1, 2, 0
     while lim > c:
