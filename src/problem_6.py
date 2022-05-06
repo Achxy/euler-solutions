@@ -7,4 +7,4 @@ def problem_6(lim=100):
 
 
 if __name__ == "__main__":
-    print(problem_6(100))
+    print(problem_6())
