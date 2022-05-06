@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from enum import Enum
 from time import perf_counter
-from typing import ClassVar, Generic, Literal, ParamSpec, TypeVar
+from typing import ClassVar, Final, Generic, Literal, ParamSpec, TypeVar
+
+__all__: Final[tuple[str]] = ("Benchmarked",)
 
 P = ParamSpec("P")
 Q = TypeVar("Q")
