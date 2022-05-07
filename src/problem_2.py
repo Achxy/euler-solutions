@@ -13,4 +13,4 @@ def problem_2(lim=40_00_000):
 
 
 if __name__ == "__main__":
-    print(problem_2())
+    problem_2()

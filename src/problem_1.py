@@ -17,4 +17,4 @@ def problem_1(length=1000):
 
 
 if __name__ == "__main__":
-    print(problem_1())
+    problem_1()

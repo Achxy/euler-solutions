@@ -9,4 +9,4 @@ def problem_20(digit=100):
 
 
 if __name__ == "__main__":
-    print(problem_20())
+    problem_20()
