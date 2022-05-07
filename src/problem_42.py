@@ -1,7 +1,9 @@
 from __future__ import annotations
-from benchmark import Benchmarked
+
 from functools import cache
 from pathlib import Path
+
+from benchmark import Benchmarked
 
 PATH: Path = Path(__file__).parent.parent / "data" / "p042_words.txt"
 

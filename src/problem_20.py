@@ -1,5 +1,6 @@
-from benchmark import Benchmarked
 from math import factorial
+
+from benchmark import Benchmarked
 
 
 @Benchmarked
