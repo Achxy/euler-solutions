@@ -10,15 +10,19 @@ PATH: Path = Path(__file__).parent.parent / "data" / "p042_words.txt"
 
 @cache
 def _is_triange_number(t) -> bool:
-    # ∵ tn = n/2(n + 1)
-    # => 0.5n^2 + 0.5n - tn = 0
-    # d = √(b^2 - 4ac)
+    """
+    ∵ tn = ½n(n+1)
+    => tn = ([n^2] / 2 + n/2)
+    Subtracting all sides by ([n^2] / 2 + n/2)
+    tn - ([n^2] / 2 + n/2) = ([n^2] / 2 + n/2) - ([n^2] / 2 + n/2)
+    so, tn - ([n^2] / 2 + n/2) = 0
+    ∴ - 0.5n^2 - 0.5n + tn = 0
 
-    # (in this case we have 2 real solutions)
-    # ie, discriminant ∈ ℕ
-    # We return if positive solution is natural
-    di = (0.25 + (2 * t)) ** 0.5
-    return not (0.5 - di) % 1
+    Hence, d = (0.25 + (2 * t)) ** 0.5
+    In this case, d ∈ N => distinct bifurcate solutions
+    The positive solution is deemed triangular if it is natural
+    """
+    return not (0.5 - ((0.25 + (2 * t)) ** 0.5)) % 1
 
 
 def _convert(data: list[str]) -> list[int]:
@@ -27,6 +31,7 @@ def _convert(data: list[str]) -> list[int]:
 
 
 def _parse(data: str) -> list[str]:
+    # Another way is to `literal_eval("[" + data + "]")`
     return [d.strip().replace('"', "").upper() for d in data.split(",")]
 
 
