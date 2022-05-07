@@ -46,6 +46,43 @@ class Benchmarked(Generic[P, R]):
         self.__elapsed: float | None = None
         self.__result: R | Literal[MISSING] = MISSING
 
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        """
+        Calls the benchmarked function and returns the result
+        also sets the elapsed time, result and then prints the human friendly
+        output
+
+        Calling the instance is roughly equivalent to:
+        >>> obj = Benchmarked(func)
+        >>> obj.benchmark(*args, **kwargs)
+        >>> obj.show_performance()
+
+        Args:
+            P: The same arguments as the wrapped function
+
+        Returns:
+            R: The result of the benchmarked function
+        """
+        ret: R = self.benchmark(*args, **kwargs)
+        self.show_performance()
+        return ret
+
+    def benchmark(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        """
+        Benchmarks the function and returns the result
+        also sets the elapsed time and result
+
+        Args:
+            P: The same arguments as the wrapped function
+
+        Returns:
+            R: The result of the benchmarked function
+        """
+        start: float = perf_counter()
+        self.__result = self.__func(*args, **kwargs)
+        self.__elapsed = (perf_counter() - start) * 1000
+        return self.__result
+
     def show_performance(self) -> None:
         """
         Prints the function name, elapsed time and result
@@ -59,20 +96,6 @@ class Benchmarked(Generic[P, R]):
             return print(f"{name}: not measured")
 
         print(f"{name} took {elapsed} milliseconds to be completed and returned '{result}'")
-
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        """
-        Calls the benchmarked function and returns the result
-        also sets the elapsed time and result
-
-        Returns:
-            R: The result of the benchmarked function
-        """
-        start: float = perf_counter()
-        self.__result = self.__func(*args, **kwargs)
-        self.__elapsed = (perf_counter() - start) * 1000
-        self.show_performance()
-        return self.__result
 
     def result(self, sentinel: Q = MISSING) -> R | Q:
         """
@@ -114,3 +137,7 @@ class Benchmarked(Generic[P, R]):
             Callable[P, R]: The wrapped function
         """
         return self.__func
+
+    @property
+    def due(self) -> float | None:
+        return self.__elapsed
