@@ -19,8 +19,9 @@ def _is_triange_number(t) -> bool:
     ∴ - 0.5n^2 - 0.5n + tn = 0
 
     Hence, d = (0.25 + (2 * t)) ** 0.5
-    In this case, d ∈ N => distinct bifurcate solutions
+    since, d > 0 we say can say we have distinct bifurcate numbers
     The positive solution is deemed triangular if it is natural
+    ie, da ∈ N
     """
     return not (0.5 - ((0.25 + (2 * t)) ** 0.5)) % 1
 
