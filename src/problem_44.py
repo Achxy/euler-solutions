@@ -1,3 +1,6 @@
+from benchmark import Benchmarked
+
+
 def is_pentagonal(n):
     """
     Pn = n(3n - 1)/2
@@ -12,5 +15,6 @@ def is_pentagonal(n):
     return not (0.5 + (0.25 + 6 * n) ** 0.5) / 3 % 1
 
 
+@Benchmarked
 def problem_44():
     ...
