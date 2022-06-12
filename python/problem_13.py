@@ -1,10 +1,8 @@
 from benchmark import Benchmarked
-from pathlib import Path
-
-PATH = Path(__file__).parent.parent / "data" / "p013_numbers.txt"
+from helper import form_path
 
 
-def _get_data(path=PATH):
+def _get_data(path=form_path("p013_numbers.txt")):
     with open(path) as f:
         return map(int, f.read().splitlines())
 

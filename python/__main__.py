@@ -8,7 +8,7 @@ from typing import TypeAlias, TypeVar
 from benchmark import Benchmarked
 
 BenchmarkMap: TypeAlias = dict[str, Benchmarked]
-IGNORE: tuple[str, ...] = ("benchmark.py", "__main__.py")
+IGNORE: tuple[str, ...] = ("benchmark.py", "__main__.py", "helper.py")
 T = TypeVar("T", bound=Benchmarked)
 
 
