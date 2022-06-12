@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 __all__: tuple[str] = ("form_path",)
 
 PATH: Path = Path(__file__).parent.parent / "data"
