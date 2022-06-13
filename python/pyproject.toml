@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "eulerpy"
+name = "EulerSolutions"
 version = "0.1.0"
 description = "My solutions to only the first 100 problems of project euler"
 authors = ["Achxy"]
