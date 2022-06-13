@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from functools import cache
-from pathlib import Path
 
 from benchmark import Benchmarked
-
-PATH: Path = Path(__file__).parent.parent / "data" / "p042_words.txt"
+from helper import form_path
 
 
 @cache
@@ -36,7 +34,7 @@ def _parse(data: str) -> list[str]:
     return [d.strip().replace('"', "").upper() for d in data.split(",")]
 
 
-def get_data(path=PATH) -> list[int]:
+def get_data(path=form_path("p042_words.txt")) -> list[int]:
     with open(path, "r") as f:
         dt: str = f.read()
     return _convert(_parse(dt))
