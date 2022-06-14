@@ -7,6 +7,8 @@ from typing import Final
 
 from benchmark import Benchmarked
 
+from helper import print
+
 GLOB_PATTERN: Final = "problem_*.py"
 
 
@@ -30,7 +32,9 @@ def main():
     for problem in problems:
         problem()
         total_time += problem.elapsed()
-    print(f"Total time taken for all {len(problems)} problems: {total_time} milliseconds")
+    print(
+        f"Total time taken for all {len(problems)} problems: {total_time} milliseconds"
+    )
 
 
 if __name__ == "__main__":

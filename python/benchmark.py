@@ -67,6 +67,42 @@ class Benchmarked(Generic[P, R]):
         self.show_performance()
         return ret
 
+    def __repr__(self) -> str:
+        """
+        Returns the representation of the benchmarked function
+
+        Returns:
+            str: The representation of the benchmarked function
+                 with the name of the function
+        """
+        cls_name = self.__class__.__name__
+        func_name = self.__func.__name__
+        return f"{cls_name}({func_name})"
+
+    def __str__(self) -> str:
+        """
+        Returns the string representation of the benchmarked function
+        with the name of the function and the elapsed time
+        and result if the benchmark has been run
+
+        Returns:
+            str: The info of the benchmark
+        """
+        name: str = self.__func.__name__
+        elapsed: float | None = self.__elapsed
+        result: R | Literal[MISSING] = self.__result
+
+        if result is MISSING:
+            return f"{name}: not measured"
+        return f"{name} took {elapsed} milliseconds to be completed and returned '{result}'"
+
+    def show_performance(self) -> None:
+        """
+        Prints the function name, elapsed time and result
+        in a human friendly format
+        """
+        print(self)
+
     def benchmark(self, *args: P.args, **kwargs: P.kwargs) -> R:
         """
         Benchmarks the function and returns the result
@@ -82,20 +118,6 @@ class Benchmarked(Generic[P, R]):
         self.__result = self.__func(*args, **kwargs)
         self.__elapsed = (perf_counter() - start) * 1000
         return self.__result
-
-    def show_performance(self) -> None:
-        """
-        Prints the function name, elapsed time and result
-        in a human friendly format
-        """
-        name: str = self.__func.__name__
-        elapsed: float | None = self.__elapsed
-        result: R | Literal[MISSING] = self.__result
-
-        if result is MISSING:
-            return print(f"{name}: not measured")
-
-        print(f"{name} took {elapsed} milliseconds to be completed and returned '{result}'")
 
     def result(self, sentinel: Q = MISSING) -> R | Q:
         """
