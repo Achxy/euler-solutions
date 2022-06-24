@@ -1,6 +1,6 @@
 from typing import Any
-from colorama import Fore, Style
 
+from colorama import Fore, Style
 
 COLOR_RANGE: dict[range, str] = {
     range(0, 140): Fore.GREEN,
