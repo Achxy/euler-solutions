@@ -1,27 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from enum import Enum
 from time import perf_counter
-from typing import ClassVar, Final, Generic, Literal, ParamSpec, TypeVar
+from typing import Generic, Literal, ParamSpec, TypeVar
 
-__all__: Final[tuple[str]] = ("Benchmarked",)
+from typeshack import MISSING as _MISSING
+from typeshack import All, Slots
+
+__all__: All = ("Benchmarked",)
 
 P = ParamSpec("P")
 Q = TypeVar("Q")
 R = TypeVar("R")
-
-
-class _Sentinel(Enum):
-    """
-    Single member enum for sentinel values
-    More acceptable for static typecheckers
-    """
-
-    MISSING = object()
-
-
-MISSING = _Sentinel.MISSING
 
 
 class Benchmarked(Generic[P, R]):
@@ -29,7 +19,7 @@ class Benchmarked(Generic[P, R]):
     The class used to benchmark problem execution time
     """
 
-    __slots__: ClassVar[tuple[str, ...]] = (
+    __slots__: Slots = (
         "__func",
         "__elapsed",
         "__result",
@@ -44,7 +34,7 @@ class Benchmarked(Generic[P, R]):
         """
         self.__func: Callable[P, R] = func
         self.__elapsed: float | None = None
-        self.__result: R | Literal[MISSING] = MISSING
+        self.__result: R | Literal[_MISSING] = _MISSING
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         """
@@ -89,10 +79,10 @@ class Benchmarked(Generic[P, R]):
             str: The info of the benchmark
         """
         name: str = self.__func.__name__
-        elapsed: float | None = self.__elapsed
-        result: R | Literal[MISSING] = self.__result
+        elapsed: float | None = self.due
+        result: R | Literal[_MISSING] = self.__result
 
-        if result is MISSING:
+        if elapsed is None:
             return f"{name}: not measured"
         return f"{name} took {elapsed} milliseconds to be completed and returned '{result}'"
 
@@ -119,19 +109,27 @@ class Benchmarked(Generic[P, R]):
         self.__elapsed = (perf_counter() - start) * 1000
         return self.__result
 
-    def result(self, sentinel: Q = MISSING) -> R | Q:
+    def result(self, sentinel: Q = _MISSING) -> R | Q:
         """
         Returns the result of the benchmarked function
         if the benchmark has not been run (ie, object not called)
-        then the sentinel is returned defaulting to `MISSING`
+        then the sentinel is returned if provided
+        else a ValueError is raised
 
         Args:
             sentinel (Q, optional): Defaults to MISSING.
 
         Returns:
-            R | Q: The result of the benchmarked function or the sentinel
+            R | Q: The result of the benchmarked function or the sentinel if provided
+
+        Raises:
+            ValueError: If the benchmark has not been run (ie, object not called)
+                        and an sentinel value was not provided
         """
-        if self.__result is MISSING:
+        if self.due is None:
+            if sentinel is _MISSING:
+                msg = "Benchmarked object not called and an sentinel value has not been provided"
+                raise ValueError(msg)
             return sentinel
         return self.__result
 
@@ -139,16 +137,15 @@ class Benchmarked(Generic[P, R]):
         """
         Returns the elapsed time in milliseconds
 
+        Returns:
+            float: The elapsed time in milliseconds
 
         Raises:
             ValueError: If the benchmark has not been run (ie, object not called)
-
-        Returns:
-            float: The elapsed time in milliseconds
         """
-        if self.__elapsed is None:
+        if self.due is None:
             raise ValueError("Benchmarked function has not been called")
-        return self.__elapsed
+        return self.due
 
     @property
     def function(self) -> Callable[P, R]:
@@ -162,4 +159,12 @@ class Benchmarked(Generic[P, R]):
 
     @property
     def due(self) -> float | None:
+        """
+        Returns the elapsed time in milliseconds
+        or None if the benchmark has not been run
+        unlike `elapsed` which raises an error if the benchmark has not been run
+
+        Returns:
+            float | None: The elapsed time in milliseconds or None
+        """
         return self.__elapsed

@@ -1,40 +1,51 @@
 from __future__ import annotations
 
 import importlib
-from collections.abc import Generator
 from pathlib import Path
 from typing import Final
 
-from benchmark import Benchmarked
+from rich import print
+from typeshack import Problems
 
-from helper import print
+GLOB_PATTERN: Final[str] = "problem_*.py"
+PARENT_DIR: Final[Path] = Path(__file__).parent
 
-GLOB_PATTERN: Final = "problem_*.py"
 
-
-def get_problems() -> Generator[Benchmarked, None, None]:
+def get_problems() -> Problems:
     """
     Returns a generator of all the Benchmarked
     decorated problems in the current directory
 
     Returns:
-        Generator[Benchmarked, None, None]: Benchmarked problems
+        Problems: Benchmarked problems
     """
-    for path in Path(__file__).parent.glob(GLOB_PATTERN):
-        stem = path.stem
+    for path in PARENT_DIR.glob(GLOB_PATTERN):
+        stem: str = path.stem
         yield importlib.import_module(stem).__dict__[stem]
 
 
-def main():
-    total_time: float = 0
-    problems: list[Benchmarked] = [*get_problems()]
+def execute_problems(problems: Problems) -> None:
+    """
+    Calls each Benchmarked instances from a given iterator
+    Then prints the total time taken to finish calling all instances
 
-    for problem in problems:
+    Args:
+        problems (Problems): An iterator containing Benchmarked class instances
+    """
+    total_time: float = 0
+    probs = [*problems]
+    for problem in probs:
         problem()
         total_time += problem.elapsed()
-    print(
-        f"Total time taken for all {len(problems)} problems: {total_time} milliseconds"
-    )
+    print(f"Total time taken for all {len(probs)} problems: {total_time} milliseconds")
+
+
+def main() -> None:
+    """
+    Entry point function for computing all the problems
+    """
+    problems: Problems = get_problems()
+    execute_problems(problems)
 
 
 if __name__ == "__main__":

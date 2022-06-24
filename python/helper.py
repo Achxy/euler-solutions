@@ -1,18 +1,11 @@
 from pathlib import Path
+from typing import Final
 
-__all__: tuple[str, ...] = (
-    "form_path",
-    "print",
-)
+from typeshack import All
 
-PATH: Path = Path(__file__).parent.parent / "data"
-
-
-try:
-    from rich import print
-except ImportError:
-    print = __builtins__.print
+__all__: All = ("form_path",)
+PATH: Final[Path] = Path(__file__).parent.parent / "data"
 
 
-def form_path(filename) -> Path:
+def form_path(filename: str) -> Path:
     return PATH / filename
