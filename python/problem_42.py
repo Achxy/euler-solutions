@@ -42,7 +42,7 @@ def get_data(path=form_path("p042_words.txt")) -> list[int]:
 
 @Benchmarked
 def problem_42(data=get_data()):
-    return sum(1 for n in data if _is_triange_number(n))
+    return sum(_is_triange_number(n) for n in data)
 
 
 if __name__ == "__main__":
