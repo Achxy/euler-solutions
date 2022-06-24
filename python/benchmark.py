@@ -23,6 +23,44 @@ def _format_benchmark(name, elapsed, result):
 class Benchmarked(Generic[P, R]):
     """
     The class used to benchmark problem execution time
+    Example usage :
+
+    ```
+    >>> @Benchmarked
+    ... def foo():
+    ...     time.sleep(2)
+    ...     return "This works!"
+    ```
+
+    A function named foo was wrapped by the Benchmarked class
+    and was reassigned to an instance of the class
+    This instance can be called like:
+
+    ```
+    >>> foo()
+    foo took 2010.2348001673818 milliseconds to be completed and returned 'This works!'
+    'This works!'
+    ```
+
+    And has methods like `elapsed` and `result` to retrieve the time
+    taken for execution and the returned result, respectively.
+
+    ```
+    >>> foo.elapsed()
+    2010.2348001673818
+    >>> foo.result()
+    'This works!'
+    ```
+
+    It can also retrieve the original function as required
+
+    ```
+    >>> original_func = foo.function
+    >>> original_func
+    <function foo at 0x0000022F2F421510>
+    >>> original_func()
+    'This works!'
+    ```
     """
 
     __slots__: Slots = (
