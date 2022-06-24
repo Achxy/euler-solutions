@@ -4,14 +4,20 @@ from collections.abc import Callable
 from time import perf_counter
 from typing import Generic, Literal, ParamSpec, TypeVar
 
-from typeshack import MISSING as _MISSING
-from typeshack import All, Slots
+from tools.typeshack import MISSING as _MISSING
+from tools.typeshack import All, Slots
+from tools.colorize import time_format
 
 __all__: All = ("Benchmarked",)
 
 P = ParamSpec("P")
 Q = TypeVar("Q")
 R = TypeVar("R")
+
+
+def _format_benchmark(name, elapsed, result):
+    colorized_time = time_format(elapsed)
+    return f"{name} took {colorized_time} milliseconds to be completed and returned '{result}'"
 
 
 class Benchmarked(Generic[P, R]):
@@ -84,7 +90,7 @@ class Benchmarked(Generic[P, R]):
 
         if elapsed is None:
             return f"{name}: not measured"
-        return f"{name} took {elapsed} milliseconds to be completed and returned '{result}'"
+        return _format_benchmark(name=name, elapsed=elapsed, result=result)
 
     def show_performance(self) -> None:
         """

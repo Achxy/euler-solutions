@@ -4,8 +4,8 @@ import importlib
 from pathlib import Path
 from typing import Final
 
-from rich import print
-from typeshack import Problems
+from colorama import init
+from tools.typeshack import Problems
 
 GLOB_PATTERN: Final[str] = "problem_*.py"
 PARENT_DIR: Final[Path] = Path(__file__).parent
