@@ -1,4 +1,3 @@
-from python.tools.helper import form_path
 from tools import Benchmarked, form_path
 
 
