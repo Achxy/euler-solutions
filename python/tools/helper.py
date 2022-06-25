@@ -4,7 +4,11 @@ from typing import Final
 
 from .typeshack import All
 
-__all__: All = ("form_path",)
+__all__: All = (
+    "form_path",
+    "clean_whitespaces",
+)
+
 PATH: Final[Path] = Path(__file__).parents[2] / "data"
 
 
