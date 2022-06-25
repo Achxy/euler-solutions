@@ -3,7 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeAlias
 
 if TYPE_CHECKING:
-    from benchmark import Benchmarked
+    from .benchmark import Benchmarked
 else:
     # During runtime
     Benchmarked = object()
