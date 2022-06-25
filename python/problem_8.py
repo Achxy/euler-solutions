@@ -1,11 +1,11 @@
 from math import prod
 
-from tools import Benchmarked, form_path
+from tools import Benchmarked, clean_whitespaces, form_path
 
 
 def _get_data(path=form_path("p008_numbers.txt")):
     with open(path, "r") as f:
-        return f.read().replace("\n", "")
+        return clean_whitespaces(f.read())
 
 
 @Benchmarked
