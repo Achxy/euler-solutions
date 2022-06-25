@@ -4,7 +4,6 @@ import importlib
 from pathlib import Path
 from typing import Final
 
-from colorama import init
 from tools.typeshack import Problems
 
 GLOB_PATTERN: Final[str] = "problem_*.py"
