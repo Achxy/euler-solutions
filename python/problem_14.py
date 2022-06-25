@@ -1,4 +1,4 @@
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 def collatz(j, _collatz_cache={0: 0, 1: 1}):

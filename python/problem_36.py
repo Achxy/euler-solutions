@@ -1,4 +1,4 @@
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 # TODO: This can be faster

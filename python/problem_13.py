@@ -1,5 +1,5 @@
-from benchmark import Benchmarked
-from tools.helper import form_path
+from python.tools.helper import form_path
+from tools import Benchmarked, form_path
 
 
 def _get_data(path=form_path("p013_numbers.txt")):

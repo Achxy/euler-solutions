@@ -1,4 +1,4 @@
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 def _summation_of_progression(leng, num):

@@ -1,4 +1,4 @@
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 def _is_palindromic_number(n) -> bool:

@@ -1,4 +1,4 @@
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 def is_pentagonal(n):

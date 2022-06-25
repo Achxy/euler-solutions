@@ -2,7 +2,7 @@ from collections import Counter
 from itertools import count
 from math import prod
 
-from benchmark import Benchmarked
+from tools import Benchmarked
 
 
 def factors(n: int) -> int:

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from functools import cache
 
-from benchmark import Benchmarked
-from tools.helper import form_path
+from tools import Benchmarked, form_path
 
 
 @cache

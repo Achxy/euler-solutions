@@ -4,9 +4,9 @@ from collections.abc import Callable
 from time import perf_counter
 from typing import Generic, Literal, ParamSpec, TypeVar
 
-from tools.colorize import time_format
-from tools.typeshack import MISSING as _MISSING
-from tools.typeshack import All, Slots
+from .colorize import time_format
+from .typeshack import MISSING as _MISSING
+from .typeshack import All, Slots
 
 __all__: All = ("Benchmarked",)
 
