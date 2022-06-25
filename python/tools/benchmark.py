@@ -2,17 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from time import perf_counter
-from typing import Generic, Literal, ParamSpec, TypeVar
+from typing import Generic, Literal
 
 from .colorize import time_format
 from .typeshack import MISSING as _MISSING
-from .typeshack import All, Slots
+from .typeshack import All, P, Q, R, Slots
 
 __all__: All = ("Benchmarked",)
-
-P = ParamSpec("P")
-Q = TypeVar("Q")
-R = TypeVar("R")
 
 
 def _format_benchmark(name, elapsed, result):

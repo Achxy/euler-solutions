@@ -1,12 +1,21 @@
 from collections.abc import Iterator
 from enum import Enum
-from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeAlias
+from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
+    from typing import ParamSpec
+
     from .benchmark import Benchmarked
+
+    P = ParamSpec("P")
 else:
     # During runtime
     Benchmarked = object()
+    P = TypeVar("P")
+
+
+Q = TypeVar("Q")
+R = TypeVar("R")
 
 All: TypeAlias = Final[tuple[str, ...]]
 Slots = ClassVar[tuple[str, ...]]
