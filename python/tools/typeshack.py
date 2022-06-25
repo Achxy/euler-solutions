@@ -21,7 +21,6 @@ R = TypeVar("R")
 
 All: TypeAlias = Final[tuple[str, ...]]
 Slots = ClassVar[tuple[str, ...]]
-Real: TypeAlias = int | float
 
 Problems: TypeAlias = Iterator[Benchmarked]
 
