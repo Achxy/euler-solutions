@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "EulerSolutions"
+version = "0.1.0"
+description = "Solutions to first 100 problems of Project Euler."
+authors = ["Achxy"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+colorama = "0.4.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
