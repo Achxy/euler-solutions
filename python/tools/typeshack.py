@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections.abc import Iterator
 from enum import Enum
-from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeVar
 
 if TYPE_CHECKING:
-    from typing import ParamSpec
+    from typing import ParamSpec, TypeAlias
 
     from .benchmark import Benchmarked
 
