@@ -11,8 +11,8 @@ def collatz(j, _collatz_cache={0: 0, 1: 1}):
 
 
 @Benchmarked
-def problem_14(limit=1_000_000):
-    return max(range(1, limit), key=collatz)
+def problem_14(domain=range(5_00_000, 10_00_000)):
+    return max(domain, key=collatz)
 
 
 if __name__ == "__main__":
