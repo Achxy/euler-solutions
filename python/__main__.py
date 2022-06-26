@@ -20,7 +20,7 @@ def get_problems() -> Problems:
     """
     for path in PARENT_DIR.glob(GLOB_PATTERN):
         stem: str = path.stem
-        yield importlib.import_module(stem).__dict__[stem]
+        yield getattr(importlib.import_module(stem), stem)
 
 
 def execute_problems(problems: Problems) -> None:
