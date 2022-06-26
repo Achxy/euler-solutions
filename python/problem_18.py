@@ -15,7 +15,7 @@ def _reform(triangle: list):
     for index, item in enumerate(second_last_row):
         new_last_row.append(max(last_row[index], last_row[index + 1]) + item)
     del triangle[-2:]
-    triangle.extend([new_last_row])
+    triangle.append(new_last_row)
 
 
 @Benchmarked
