@@ -5,7 +5,7 @@ def _parse_triangle(data: str) -> list[list[int]]:
     return [[int(x) for x in line.split()] for line in data.splitlines()]
 
 
-def get_triangle_data(path=form_path("018_triangle.txt")) -> list[list[int]]:
+def get_triangle_data(path=form_path("p018_triangle.txt")) -> list[list[int]]:
     with open(path, "r") as f:
         return _parse_triangle(f.read())
 
