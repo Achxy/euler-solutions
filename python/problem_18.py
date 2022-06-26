@@ -1,7 +1,7 @@
 from tools import Benchmarked, form_path
 
 
-def _parse_triangle(data: str):
+def _parse_triangle(data):
     return [[int(x) for x in line.split()] for line in data.splitlines()]
 
 
@@ -11,11 +11,9 @@ def get_triangle_data(path=form_path("p018_triangle.txt")):
 
 
 def _reform(triangle):
-    second_last_row, last_row, new_last_row = triangle[-2], triangle[-1], []
-    for index, item in enumerate(second_last_row):
-        new_last_row.append(max(last_row[index], last_row[index + 1]) + item)
-    del triangle[-2:]
-    triangle.append(new_last_row)
+    lrow = triangle[-1]
+    triangle.append([max(lrow[i], lrow[i + 1]) + v for i, v in enumerate(triangle[-2])])
+    del triangle[-3:-1]
 
 
 @Benchmarked
