@@ -1,6 +1,8 @@
 from tools import Benchmarked
+from numba import njit, uint16, uint8, uint32
 
 
+@njit(uint32(uint16, uint8))
 def _summation_of_progression(leng, num):
     k = leng // num
     return k * ((num + (num * k)) / 2)
