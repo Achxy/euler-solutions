@@ -1,4 +1,4 @@
-from problem_18 import problem_18, get_triangle_data
+from problem_18 import get_triangle_data, problem_18
 from tools import Benchmarked, form_path
 
 
