@@ -1,28 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Awaitable, Iterator
 from enum import Enum
-from typing import TYPE_CHECKING, ClassVar, Final, Literal, TypeVar
+from typing import TYPE_CHECKING, Callable, ClassVar, Coroutine, Final, Literal, TypeVar
 
 if TYPE_CHECKING:
     from typing import ParamSpec, TypeAlias
 
     from .benchmark import Benchmarked
 
-    P = ParamSpec("P")
+    Params = ParamSpec("Params")
 else:
     # During runtime
     Benchmarked = object()
-    P = TypeVar("P")
-
-
-Q = TypeVar("Q")
-R = TypeVar("R")
-
-All: TypeAlias = Final[tuple[str, ...]]
-Slots = ClassVar[tuple[str, ...]]
-
-Problems: TypeAlias = Iterator[Benchmarked]
+    Params = TypeVar("Params")
 
 
 class _Sentinel(Enum):
@@ -38,4 +29,19 @@ class _Sentinel(Enum):
     MISSING = object()
 
 
+Q = TypeVar("Q")
+Result = TypeVar("Result")
+
+All: TypeAlias = Final[tuple[str, ...]]
+OptionalFloat: TypeAlias = float | None
+Slots = ClassVar[tuple[str, ...]]
+
 MISSING: Literal[_Sentinel.MISSING] = _Sentinel.MISSING
+Coro: TypeAlias = Coroutine[None, None, Result]
+Func: TypeAlias = Callable[Params, Result]
+CoroFunc: TypeAlias = Callable[Params, Coro]
+AnyFunc: TypeAlias = Func | CoroFunc
+CanBeFunctionOrCoro: TypeAlias = Func | Coro
+CouldBeMissing: TypeAlias = Result | Literal[MISSING]
+
+Problems: TypeAlias = Iterator[Benchmarked]
