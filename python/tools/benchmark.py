@@ -1,22 +1,35 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable, Coroutine, Generator
+from asyncio import iscoroutine, iscoroutinefunction
 from time import perf_counter
-from typing import Generic, Literal
+from typing import Final, Generic, Literal, NoReturn, overload, Any
+from typing_extensions import reveal_type
 
 from .colorize import time_format
+from .helper import get_name, repr_fmt
 from .typeshack import MISSING as _MISSING
-from .typeshack import All, P, Q, R, Slots
+from .typeshack import (
+    All,
+    OptionalFloat,
+    Params,
+    CoVarCoroFunction,
+    Q,
+    Result,
+    Slots,
+)
 
 __all__: All = ("Benchmarked",)
 
+ANONYMOUS_CALLABLE: Final[str] = "<anonymous_callable>"
 
-def _format_benchmark(name, elapsed, result):
+
+def _format_benchmark(name: str, elapsed: float, result: Any):
     colorized_time = time_format(elapsed)
     return f"{name} took {colorized_time} milliseconds to be completed and returned '{result}'"
 
 
-class Benchmarked(Generic[P, R]):
+class Benchmarked(Generic[Params, Result]):
     """
     The class used to benchmark problem execution time
     Example usage :
@@ -60,23 +73,43 @@ class Benchmarked(Generic[P, R]):
     """
 
     __slots__: Slots = (
-        "__func",
-        "__elapsed",
-        "__result",
+        "_routine",
+        "_original_callable",
+        "_elapsed",
+        "_result",
     )
 
-    def __init__(self, func: Callable[P, R]) -> None:
+    # Sync Function
+    @overload
+    def __init__(
+        self,
+        routine: Callable[Params, Result],
+        original_callable: Callable[Params, Result],
+    ):
+        ...
+
+    # Async Coroutine Function
+    @overload
+    def __init__(
+        self,
+        routine: Awaitable[Result],
+        original_callable: Callable[Params, Awaitable[Result]],
+    ):
+        ...
+
+    def __init__(self, routine, original_callable) -> None:
         """
         Initializes the benchmarked function
 
         Args:
             func (Callable[P, R]): The function to benchmark
         """
-        self.__func: Callable[P, R] = func
-        self.__elapsed: float | None = None
-        self.__result: R | Literal[_MISSING] = _MISSING
+        self._routine = routine
+        self._original_callable = original_callable
+        self._elapsed: OptionalFloat = None
+        self._result: Result | Literal[_MISSING] = _MISSING
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: Params.args, **kwargs: Params.kwargs) -> Result:
         """
         Calls the benchmarked function and returns the result
         also sets the elapsed time, result and then prints the human friendly
@@ -93,8 +126,14 @@ class Benchmarked(Generic[P, R]):
         Returns:
             R: The result of the benchmarked function
         """
-        ret: R = self.benchmark(*args, **kwargs)
+        ret: Result = self.benchmark(*args, **kwargs)
         self.show_performance()
+        return ret
+
+    def __await__(self) -> Generator[Awaitable[Result], None, Result]:
+        if not self.is_coroutine:
+            raise TypeError("Cannot be awaited unless instantiated with a coroutine")
+        ret: Result = yield from self._routine.__await__()
         return ret
 
     def __repr__(self) -> str:
@@ -105,9 +144,9 @@ class Benchmarked(Generic[P, R]):
             str: The representation of the benchmarked function
                  with the name of the function
         """
-        cls_name = self.__class__.__name__
-        func_name = self.__func.__name__
-        return f"{cls_name}({func_name})"
+        cls = type(self)
+        function_name = get_name(self.function, ANONYMOUS_CALLABLE)
+        return repr_fmt(cls, function_name)
 
     def __str__(self) -> str:
         """
@@ -118,9 +157,9 @@ class Benchmarked(Generic[P, R]):
         Returns:
             str: The info of the benchmark
         """
-        name: str = self.__func.__name__
-        elapsed: float | None = self.due
-        result: R | Literal[_MISSING] = self.__result
+        name: str = get_name(self.function, ANONYMOUS_CALLABLE)
+        elapsed: OptionalFloat = self.due
+        result: Result | Literal[_MISSING] = self._result
 
         if elapsed is None:
             return f"{name}: not measured"
@@ -133,7 +172,7 @@ class Benchmarked(Generic[P, R]):
         """
         print(self)
 
-    def benchmark(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def benchmark(self, *args: Params.args, **kwargs: Params.kwargs) -> Result:
         """
         Benchmarks the function and returns the result
         also sets the elapsed time and result
@@ -144,12 +183,14 @@ class Benchmarked(Generic[P, R]):
         Returns:
             R: The result of the benchmarked function
         """
+        if self.is_coroutine:
+            raise TypeError("Coroutine object not callable, did you mean to await it?")
         start: float = perf_counter()
-        self.__result = self.__func(*args, **kwargs)
-        self.__elapsed = (perf_counter() - start) * 1000
-        return self.__result
+        self._result = self._routine(*args, **kwargs)
+        self._elapsed = (perf_counter() - start) * 1000
+        return self._result
 
-    def result(self, sentinel: Q = _MISSING) -> R | Q:
+    def result(self, sentinel: Q = _MISSING) -> Result | Q:
         """
         Returns the result of the benchmarked function
         if the benchmark has not been run (ie, object not called)
@@ -171,7 +212,7 @@ class Benchmarked(Generic[P, R]):
                 msg = "Benchmarked object not called and an sentinel value has not been provided"
                 raise ValueError(msg)
             return sentinel
-        return self.__result
+        return self._result
 
     def elapsed(self) -> float:
         """
@@ -188,17 +229,21 @@ class Benchmarked(Generic[P, R]):
         return self.due
 
     @property
-    def function(self) -> Callable[P, R]:
+    def is_coroutine(self) -> bool:
+        return iscoroutine(self._routine)
+
+    @property
+    def function(self) -> Callable[Params, Result | Awaitable[Result]]:
         """
         Returns the function that is wrapped by this class
 
         Returns:
             Callable[P, R]: The wrapped function
         """
-        return self.__func
+        return self._original_callable
 
     @property
-    def due(self) -> float | None:
+    def due(self) -> OptionalFloat:
         """
         Returns the elapsed time in milliseconds
         or None if the benchmark has not been run
@@ -207,4 +252,22 @@ class Benchmarked(Generic[P, R]):
         Returns:
             float | None: The elapsed time in milliseconds or None
         """
-        return self.__elapsed
+        return self._elapsed
+
+
+def benchmark(*args, **kwargs):
+    def wrapper(func: Callable[Params, Result]) -> Benchmarked[Params, Result]:
+        return Benchmarked[Params, Result](routine=func, original_callable=func)
+
+    return wrapper
+
+
+def async_benchmark(*args, **kwargs):
+    def wrapper(corofunc):
+        def inner(*called_args, **called_kwargs):
+            coro = corofunc(*called_args, **called_kwargs)
+            return Benchmarked(routine=coro, original_callable=corofunc)
+
+        return inner
+
+    return wrapper
