@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Coroutine, Generator
-from functools import wraps
-from inspect import iscoroutinefunction
+from asyncio import iscoroutinefunction
 from time import perf_counter
-from typing import Final, Generic, Literal, overload, Any
+from typing import Final, Generic, Literal, NoReturn, overload, Any
 from typing_extensions import reveal_type
 
 from .colorize import time_format
@@ -78,22 +77,6 @@ class Benchmarked(Generic[Params, Result]):
         "_elapsed",
         "_result",
     )
-
-    @overload
-    def __init__(
-        self,
-        syncfunc_or_coro: Callable[Params, Result],
-        original_corofunc: None,
-    ) -> None:
-        ...
-
-    @overload
-    def __init__(
-        self,
-        syncfunc_or_coro: Awaitable[Result],
-        original_corofunc: Callable[Params, Awaitable[Result]],
-    ) -> None:
-        ...
 
     def __init__(self, syncfunc_or_coro, original_corofunc) -> None:
         """
@@ -258,23 +241,35 @@ class Benchmarked(Generic[Params, Result]):
 def _corofunc_wrapper(
     corofunc: Callable[Params, Awaitable[Result]]
 ) -> Callable[Params, Benchmarked[Params, Result]]:
-    # It is better not to use functools.wraps here
-    # to avoid confusion
+    # It is better not to use `functools.wraps` here
+    # to avoid confusions with signatures.
     def benchmark_wrapper(
         *args: Params.args, **kwargs: Params.kwargs
     ) -> Benchmarked[Params, Result]:
         coro: Awaitable[Result] = corofunc(*args, **kwargs)
-        return Benchmarked(coro, original_corofunc=corofunc)
+        return Benchmarked[Params, Result](coro, original_corofunc=corofunc)
 
     return benchmark_wrapper
 
 
+# Sync Function
+@overload
+def benchmark(anyfunc: Callable[Params, Result]) -> Benchmarked[Params, Result]:
+    ...
+
+
+# Async Coroutine Function
+@overload
 def benchmark(
-    anyfunc: Callable[Params, Result] | Callable[Params, Coroutine[None, None, Result]]
-) -> Callable[Params, Benchmarked[Params, Result]] | Benchmarked[Params, Result]:
+    anyfunc: Callable[Params, Coroutine[Any, Any, Result]]
+) -> Callable[Params, Benchmarked[Params, Result]]:
+    ...
+
+
+def benchmark(anyfunc: Callable):
     if iscoroutinefunction(anyfunc):
-        return _corofunc_wrapper(anyfunc)  # type: ignore
+        return _corofunc_wrapper(anyfunc)
     if callable(anyfunc):
-        return Benchmarked(anyfunc, original_corofunc=None)  # type: ignore
+        return Benchmarked(anyfunc, original_corofunc=None)
     msg = f"Expected callable, got {anyfunc!r} instead"
     raise TypeError(msg)
