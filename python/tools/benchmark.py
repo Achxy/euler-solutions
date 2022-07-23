@@ -289,3 +289,19 @@ def benchmark(anyfunc: Callable):
         return Benchmarked(routine=anyfunc, original_callable=anyfunc)
     msg = f"Expected callable, got {anyfunc!r} instead"
     raise TypeError(msg)
+
+
+@benchmark
+async def foo():
+    return 1
+
+
+print(
+    foo, type(foo)
+)  # <function _corofunc_wrapper.<locals>.benchmark_wrapper at 0x000002BED19EE5F0> <class 'function'>
+reveal_type(foo)  # Type of "foo" is "Benchmarked[(), Coroutine[Any, Any, Literal[1]]]"
+
+x = foo()
+
+print(x, type(x))  # foo: not measured <class 'tools.benchmark.Benchmarked'>
+reveal_type(x)  # Type of "x" is "Coroutine[Any, Any, Literal[1]]"
