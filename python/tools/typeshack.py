@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Iterator
+from types import CoroutineType
 from enum import Enum
 from typing import TYPE_CHECKING, Callable, ClassVar, Coroutine, Final, Literal, TypeVar
 
@@ -31,6 +32,9 @@ class _Sentinel(Enum):
 
 Q = TypeVar("Q")
 Result = TypeVar("Result")
+CoVarCoroFunction = TypeVar(
+    "CoVarCoroFunction", bound=Callable[..., CoroutineType], covariant=True
+)
 
 All: TypeAlias = Final[tuple[str, ...]]
 OptionalFloat: TypeAlias = float | None

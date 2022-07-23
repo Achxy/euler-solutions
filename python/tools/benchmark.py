@@ -13,6 +13,7 @@ from .typeshack import (
     All,
     OptionalFloat,
     Params,
+    CoVarCoroFunction,
     Q,
     Result,
     Slots,
@@ -254,54 +255,19 @@ class Benchmarked(Generic[Params, Result]):
         return self._elapsed
 
 
-def _corofunc_wrapper(
-    corofunc: Callable[Params, Awaitable[Result]]
-) -> Callable[Params, Benchmarked[Params, Result]]:
-    # It is better not to use `functools.wraps` here
-    # to avoid confusions with signatures.
-    def benchmark_wrapper(
-        *args: Params.args, **kwargs: Params.kwargs
-    ) -> Benchmarked[Params, Result]:
-        coro: Awaitable[Result] = corofunc(*args, **kwargs)
-        return Benchmarked[Params, Result](routine=coro, original_callable=corofunc)
+def benchmark(*args, **kwargs):
+    def wrapper(func: Callable[Params, Result]) -> Benchmarked[Params, Result]:
+        return Benchmarked[Params, Result](routine=func, original_callable=func)
 
-    return benchmark_wrapper
+    return wrapper
 
 
-# Sync Function
-@overload
-def benchmark(anyfunc: Callable[Params, Result]) -> Benchmarked[Params, Result]:
-    ...
+def async_benchmark(*args, **kwargs):
+    def wrapper(corofunc):
+        def inner(*called_args, **called_kwargs):
+            coro = corofunc(*called_args, **called_kwargs)
+            return Benchmarked(routine=coro, original_callable=corofunc)
 
+        return inner
 
-# Async Coroutine Function
-@overload
-def benchmark(
-    anyfunc: Callable[Params, Coroutine[Any, Any, Result]]
-) -> Callable[Params, Benchmarked[Params, Result]]:
-    ...
-
-
-def benchmark(anyfunc: Callable):
-    if iscoroutinefunction(anyfunc):
-        return _corofunc_wrapper(anyfunc)
-    if callable(anyfunc):
-        return Benchmarked(routine=anyfunc, original_callable=anyfunc)
-    msg = f"Expected callable, got {anyfunc!r} instead"
-    raise TypeError(msg)
-
-
-@benchmark
-async def foo():
-    return 1
-
-
-print(
-    foo, type(foo)
-)  # <function _corofunc_wrapper.<locals>.benchmark_wrapper at 0x000002BED19EE5F0> <class 'function'>
-reveal_type(foo)  # Type of "foo" is "Benchmarked[(), Coroutine[Any, Any, Literal[1]]]"
-
-x = foo()
-
-print(x, type(x))  # foo: not measured <class 'tools.benchmark.Benchmarked'>
-reveal_type(x)  # Type of "x" is "Coroutine[Any, Any, Literal[1]]"
+    return wrapper
