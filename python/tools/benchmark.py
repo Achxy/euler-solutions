@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Coroutine, Generator
-from asyncio import iscoroutinefunction
+from asyncio import iscoroutine, iscoroutinefunction
 from time import perf_counter
 from typing import Final, Generic, Literal, NoReturn, overload, Any
 from typing_extensions import reveal_type
@@ -72,21 +72,39 @@ class Benchmarked(Generic[Params, Result]):
     """
 
     __slots__: Slots = (
-        "_sub_or_co_routine",
-        "_original_coro",
+        "_routine",
+        "_original_callable",
         "_elapsed",
         "_result",
     )
 
-    def __init__(self, syncfunc_or_coro, original_corofunc) -> None:
+    # Sync Function
+    @overload
+    def __init__(
+        self,
+        routine: Callable[Params, Result],
+        original_callable: Callable[Params, Result],
+    ):
+        ...
+
+    # Async Coroutine Function
+    @overload
+    def __init__(
+        self,
+        routine: Awaitable[Result],
+        original_callable: Callable[Params, Awaitable[Result]],
+    ):
+        ...
+
+    def __init__(self, routine, original_callable) -> None:
         """
         Initializes the benchmarked function
 
         Args:
             func (Callable[P, R]): The function to benchmark
         """
-        self._sub_or_co_routine = syncfunc_or_coro
-        self._original_coro = original_corofunc
+        self._routine = routine
+        self._original_callable = original_callable
         self._elapsed: OptionalFloat = None
         self._result: Result | Literal[_MISSING] = _MISSING
 
@@ -114,7 +132,7 @@ class Benchmarked(Generic[Params, Result]):
     def __await__(self) -> Generator[Awaitable[Result], None, Result]:
         if not self.is_coroutine:
             raise TypeError("Cannot be awaited unless instantiated with a coroutine")
-        ret: Result = yield from self._sub_or_co_routine.__await__()
+        ret: Result = yield from self._routine.__await__()
         return ret
 
     def __repr__(self) -> str:
@@ -167,7 +185,7 @@ class Benchmarked(Generic[Params, Result]):
         if self.is_coroutine:
             raise TypeError("Coroutine object not callable, did you mean to await it?")
         start: float = perf_counter()
-        self._result = self._sub_or_co_routine(*args, **kwargs)
+        self._result = self._routine(*args, **kwargs)
         self._elapsed = (perf_counter() - start) * 1000
         return self._result
 
@@ -211,19 +229,17 @@ class Benchmarked(Generic[Params, Result]):
 
     @property
     def is_coroutine(self) -> bool:
-        return self._original_coro is not None
+        return iscoroutine(self._routine)
 
     @property
-    def function(self) -> Callable[Params, Result]:
+    def function(self) -> Callable[Params, Result | Awaitable[Result]]:
         """
         Returns the function that is wrapped by this class
 
         Returns:
             Callable[P, R]: The wrapped function
         """
-        if self.is_coroutine:
-            return self._original_coro
-        return self._sub_or_co_routine
+        return self._original_callable
 
     @property
     def due(self) -> OptionalFloat:
@@ -247,7 +263,7 @@ def _corofunc_wrapper(
         *args: Params.args, **kwargs: Params.kwargs
     ) -> Benchmarked[Params, Result]:
         coro: Awaitable[Result] = corofunc(*args, **kwargs)
-        return Benchmarked[Params, Result](coro, original_corofunc=corofunc)
+        return Benchmarked[Params, Result](routine=coro, original_callable=corofunc)
 
     return benchmark_wrapper
 
@@ -270,6 +286,6 @@ def benchmark(anyfunc: Callable):
     if iscoroutinefunction(anyfunc):
         return _corofunc_wrapper(anyfunc)
     if callable(anyfunc):
-        return Benchmarked(anyfunc, original_corofunc=None)
+        return Benchmarked(routine=anyfunc, original_callable=anyfunc)
     msg = f"Expected callable, got {anyfunc!r} instead"
     raise TypeError(msg)
